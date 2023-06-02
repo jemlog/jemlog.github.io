@@ -2,7 +2,7 @@
   "name": "jemlog",
   "private": false,
   "description": "jemlog is a gatsby theme developed for developers to write tech blogs.",
-  "homepage": "https://jemlog/jemlog.github.io",
+  "homepage": "https://jemlog.github.io",
   "version": "0.2.0",
   "author": "Hudi",
   "dependencies": {
