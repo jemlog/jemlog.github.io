@@ -2,7 +2,7 @@ module.exports = {
   title: "jemlog",
   description: "Hello :) I'm Hudi who developed gatsby-starter-hoodie theme.",
   author: "jemin",
-  siteUrl: "https://devhudi.github.io/gatsby-starter-hoodie/",
+  siteUrl: "https://jemlog.github.io/",
   links: {
     github: "https://github.com/jemlog",
     linkedIn: "https://linkedin.com",
