@@ -1,8 +1,8 @@
 {
-  "name": "gatsby-starter-hoodie",
+  "name": "jemlog",
   "private": false,
-  "description": "gatsby-starter-hoodie is a gatsby theme developed for developers to write tech blogs.",
-  "homepage": "https://devhudi.github.io/gatsby-starter-hoodie/",
+  "description": "jemlog is a gatsby theme developed for developers to write tech blogs.",
+  "homepage": "https://jemlog/jemlog.github.io",
   "version": "0.2.0",
   "author": "Hudi",
   "dependencies": {
@@ -77,9 +77,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/devHudi/gatsby-starter-hoodie"
+    "url": "https://github.com/jemlog/jemlog.github.io"
   },
   "bugs": {
-    "url": "https://github.com/devHudi/gatsby-starter-hoodie"
+    "url": "https://github.com/jemlog/jemlog.github.io"
   }
 }
