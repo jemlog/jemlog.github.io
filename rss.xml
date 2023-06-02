@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[RSS Feed of jemlog]]></title><description><![CDATA[저의 노력이 세상에 가치를 더하길 바라는 백엔드 지망생입니다.]]></description><link>https://jemlog.github.io</link><generator>GatsbyJS</generator><lastBuildDate>Fri, 02 Jun 2023 15:15:17 GMT</lastBuildDate><item><title><![CDATA[Naver D2 DBMS는 어떻게 트랜잭션을 관리할까 정리]]></title><description><![CDATA[Naver D2의 트랜잭션 관련 아티클을 정리해보려 한다. 프레임워크 레벨에서만 적용하던 트랜잭션의 내부 동작 방식을 자세히 공부할 수 있는 좋은 기회였다. 트랜잭션 종료의…]]></description><link>https://jemlog.github.io/DB 트랜잭션/</link><guid isPermaLink="false">https://jemlog.github.io/DB 트랜잭션/</guid><pubDate>Sat, 03 Jun 2023 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;Naver D2의 트랜잭션 관련 아티클을 정리해보려 한다. 프레임워크 레벨에서만 적용하던 트랜잭션의 내부 동작 방식을 자세히 공부할 수 있는 좋은 기회였다.&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[RSS Feed of jemlog]]></title><description><![CDATA[저의 노력이 세상에 가치를 더하길 바라는 백엔드 지망생입니다.]]></description><link>https://jemlog.github.io</link><generator>GatsbyJS</generator><lastBuildDate>Fri, 02 Jun 2023 15:19:55 GMT</lastBuildDate><item><title><![CDATA[Naver D2 DBMS는 어떻게 트랜잭션을 관리할까 정리]]></title><description><![CDATA[Naver D2의 트랜잭션 관련 아티클을 정리해보려 한다. 프레임워크 레벨에서만 적용하던 트랜잭션의 내부 동작 방식을 자세히 공부할 수 있는 좋은 기회였다. 트랜잭션 종료의…]]></description><link>https://jemlog.github.io/DB 트랜잭션/</link><guid isPermaLink="false">https://jemlog.github.io/DB 트랜잭션/</guid><pubDate>Sat, 03 Jun 2023 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;Naver D2의 트랜잭션 관련 아티클을 정리해보려 한다. 프레임워크 레벨에서만 적용하던 트랜잭션의 내부 동작 방식을 자세히 공부할 수 있는 좋은 기회였다.&lt;/p&gt;
 &lt;h3&gt;트랜잭션 종료의 3가지 상태&lt;/h3&gt;
 &lt;hr&gt;
 &lt;p&gt;- 문제 없이 정상적으로 커밋&lt;/p&gt;
@@ -6,7 +6,7 @@
 &lt;p&gt;- 시스템 문제로 인한 DBMS 서버의 재시작&lt;/p&gt;
 &lt;h3&gt;트랜잭션 관리를 위한 DBMS의 전략&lt;/h3&gt;
 &lt;hr&gt;
-&lt;p&gt;&lt;img src=&quot;..%2F..%2F..%2F..%2FDesktop%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202023-06-03%20%EC%98%A4%EC%A0%84%2012.14.06.png&quot; alt=&quot;스크린샷 2023-06-03 오전 12.14.06.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/CMC11th-Melly/Melly_Server/assets/82302520/6b1800fd-f90e-405e-acd2-231151bd7d78&quot; alt=&quot;스크린샷 2023-06-03 오전 12 14 06&quot;&gt;&lt;/p&gt;
 &lt;p&gt;위의 사진처럼 DBMS는 크게 질의 처리기와 저장 시스템으로 구성되어있다. MySQL을 예로 든다면 MySQL 엔진과 스토리지 엔진을 말한다. DBMS는 대부분의 데이터를 디스크에 저장하지만 데이터의 일부는 메인 메모리에 유지한다. 이 메인 메모리 영역을 페이지 버퍼라고 하고, MySQL에서는 InnoDB 버퍼 풀을 지칭한다.&lt;/p&gt;
 &lt;p&gt;페이지 버퍼를 관리하는 모듈을 버퍼 관리자라고 하는데, 이 모듈의 정책에 따라 트랜잭션의 UNDO 복구나 REDO 복구의 필요성이 결정된다.   &lt;/p&gt;
 &lt;h3&gt;UNDO 로그와 복구&lt;/h3&gt;
@@ -35,7 +35,7 @@
 &lt;h3&gt;복구를 위해서 사용되는 로그&lt;/h3&gt;
 &lt;hr&gt;
 &lt;p&gt;UNDO 복구와 REDO 복구를 위해서 주로 로그(Log)가 사용된다. 로그를 이해하기 위해서는 로그 레코드, 로그 버퍼 그리고 로그 파일에 대해 알아야 한다.&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;..%2F..%2F..%2F..%2FDesktop%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202023-06-03%20%EC%98%A4%EC%A0%84%2012.13.55.png&quot; alt=&quot;스크린샷 2023-06-03 오전 12.13.55.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://github.com/CMC11th-Melly/Melly_Server/assets/82302520/9ebfe79c-3dff-40c3-9887-b09d43c1861c&quot; alt=&quot;스크린샷 2023-06-03 오전 12 13 55&quot;&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;로그 레코드&lt;/strong&gt; : 오퍼레이션이 실행되면 그에 대한 로그 레코드가 생성된다. 로그 레코드는 LSN(Log Sequence Number)라는 로그 식별자를 가지고, append 되는 방식으로 축적되기 때문에 단조 증가하는 성질을 가진다. MySQL의 Auto_Increment와 비슷한 느낌이다. &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;로그 버퍼&lt;/strong&gt; : 로그 레코드는 한개씩 디스크에 반영되는 것이 아니라 로그 버퍼에 먼저 축적된다. &lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;로그 파일&lt;/strong&gt; : 로그가 축적되는 디스크에 있는 파일이다. 로그 버퍼의 로그들은 특정 시점에 로그 파일로 출력된다.&lt;/p&gt;
