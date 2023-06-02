@@ -1,0 +1,1 @@
+{"componentChunkName":"component---src-templates-series-jsx","path":"/series/database","result":{"data":{"posts":{"nodes":[{"excerpt":"hello","fields":{"slug":"/DB 트랜잭션/"},"frontmatter":{"date":"June 03, 2023","update":"Jun 03, 2023","title":"Naver D2 DBMS는 어떻게 트랜잭션을 관리할까 정리","tags":["jemlog","database"]}}]}},"pageContext":{"series":"database"}},"staticQueryHashes":[]}
