@@ -1,6 +1,6 @@
 module.exports = {
   title: "jemlog",
-  description: "Hello :) I'm Hudi who developed gatsby-starter-hoodie theme.",
+  description: "저의 노력이 세상에 가치를 더하길 바라는 백엔드 지망생입니다.",
   author: "jemin",
   siteUrl: "https://jemlog.github.io",
   links: {

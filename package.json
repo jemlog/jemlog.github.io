@@ -1,10 +1,10 @@
 {
   "name": "jemlog",
   "private": false,
-  "description": "jemlog is a gatsby theme developed for developers to write tech blogs.",
+  "description": "저의 노력이 세상에 가치를 더하길 바라는 백엔드 지망생입니다.",
   "homepage": "https://jemlog.github.io",
   "version": "0.2.0",
-  "author": "Hudi",
+  "author": "Jemin",
   "dependencies": {
     "gatsby": "^2.25.3",
     "gatsby-image": "^2.4.21",
