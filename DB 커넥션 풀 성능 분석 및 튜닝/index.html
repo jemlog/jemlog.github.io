@@ -170,7 +170,7 @@ data-styled.g66[id="Footer__HiddenWrapper-sc-1ulyeok-9"]{content:"iSrIfx,kHhgkH,
 <p>MaximumPoolSize는 커넥션 풀이 가질 수 있는 커넥션의 최대 개수를 설정한다. 디폴트 값은 10개다.</p>
 <p><img src="https://github.com/jemlog/jemlog.github.io/assets/82302520/6bb0c3d6-7584-4c1c-9270-70cbe07a06d4" alt="thread_1"></p>
 <p>여기서 커넥션의 최대 개수는 현재 활동중인(Active) 커넥션과 유휴 상태(Idle)에 있는 커넥션을 모두 포함한 개수다. 최대 커넥션 개수는 특히 중요하다고 할 수 있는데, 이는 maximumPoolSize 설정 값에 따라 TPS가 달라지기 때문이다.</p>
-<h2>TPS 계산법</h2>
+<h3>TPS 계산법</h3>
 <p>먼저 TPS가 정확하게 어떤 값인지 알아보도록 하자. TPS(Transaction Per Second)는 <strong>초 당 처리할 수 있는 트랜잭션의 수</strong>를 나타낸다. </p>
 <blockquote>
 <p>TPS = 하나의 커넥션이 1초 동안 처리한 트랜잭션의 수 X 동시 커넥션 수</p>
