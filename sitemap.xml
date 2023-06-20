@@ -4,10 +4,12 @@
 <url> <loc>https://jemlog.github.io/@AuthenticationPrincipal에 null값 들어오는 문제 해결/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/DB 커넥션 풀 성능 분석 및 튜닝/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/서비스 계층 단위 테스트의 필요성에 대한 고찰/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://jemlog.github.io/gradle_caching/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/series/database</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/series/spring</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/series/DBCP</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/series/리팩토링</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://jemlog.github.io/series/서비스-성능-튜닝</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/search/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/series/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
