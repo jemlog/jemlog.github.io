@@ -178,7 +178,7 @@ data-styled.g66[id="Footer__HiddenWrapper-sc-1ulyeok-9"]{content:"iSrIfx,kHhgkH,
 <p>락 메커니즘을 사용할때 꼭 설정해야 하는 것중 하나가 <code class="language-text">락 타임아웃</code>이다. 만약 락을 획득한 트랜잭션이 무한정 락을 소유하고 있을 수 있다면 어떻게 될까. 해당 트랜잭션에서 지연이 발생하거나, 분산 서버 환경에서 락을 들고 있는 서버가 죽어버린다면
 락의 소유권은 영영 돌려받을 수 없게 된다. 다른 트랜잭션들은 락 획득을 위해 무한정 대기하게 되고 결국 <code class="language-text">데드락</code>이 발생할 것이다.</p>
 <p>락 타임아웃이 트랜잭션 작동 시간보다 길다면 문제는 발생하지 않는다. 하지만 트랜잭션 내 비정상적인 지연으로 인해 <strong>트랜잭션 커밋보다 락 타임아웃이 먼저 만료가 되면</strong> 문제가 발생한다.</p>
-<img width='713' alt='스크린샷 2023-06-26 오전 12 16 16' src='https://github.com/CMC11th-Melly/Melly_Server/assets/82302520/2ad8a263-be32-4d4a-9382-320a72a7e4ce'>
+<p><img src="https://github.com/jemlog/jemlog.github.io/assets/82302520/8d7123ba-3ad1-4a05-9fb6-16c5e953eaae" alt="스크린샷 2023-06-26 오전 3 09 57"></p>
 <ul>
 <li>Client 1이 계좌에서 돈을 인출하기 위해 락을 획득한다.</li>
 <li>Client 2는 락을 획득하기 위해 대기한다.</li>
