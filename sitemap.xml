@@ -7,6 +7,7 @@
 <url> <loc>https://jemlog.github.io/gradle_caching/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/security_exception/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/Optimistic Lock과 분산락의 혼합 사용으로 동시성 완전히 제어하기/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://jemlog.github.io/AOP를 사용하여 비즈니스 로직에서 락 분리하기/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/series/database</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/series/spring</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://jemlog.github.io/series/DBCP</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
