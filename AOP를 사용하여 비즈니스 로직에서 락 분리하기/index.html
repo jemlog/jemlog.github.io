@@ -363,9 +363,7 @@ data-styled.g66[id="Footer__HiddenWrapper-sc-1ulyeok-9"]{content:"iSrIfx,kHhgkH,
             <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">OptimisticLockException</span> <span class="token operator">|</span> <span class="token class-name">ObjectOptimisticLockingFailureException</span> <span class="token operator">|</span> <span class="token class-name">CannotAcquireLockException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
                 log<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"{} 발생"</span><span class="token punctuation">,</span> e<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
                 exceptionHolder <span class="token operator">=</span> e<span class="token punctuation">;</span>
-                <span class="token comment">//RETRY_WAIT_TIME ms 쉬고 다시 시도</span>
-                <span class="token comment">//for loop에서 sleep busy waiting이 된다는 경고가 뜸 무슨의미일지 찾아보자.</span>
-                <span class="token comment">//interval을 주는 다른 방법이 있을지 찾아 봐야함.</span>
+
                 <span class="token class-name">Thread</span><span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span>retryInterval<span class="token punctuation">)</span><span class="token punctuation">;</span>
             <span class="token punctuation">}</span>
         <span class="token punctuation">}</span>
