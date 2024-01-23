@@ -21,7 +21,7 @@
   {% assign update_list = update_list | push: entry %}
 {% endfor %}
 
-{% if update_list.size > 0 %}
+<!--{% if update_list.size > 0 %}-->
 
   <section id="access-lastmod">
     <h2 class="panel-heading">{{- site.data.locales[include.lang].panel.lastmod -}}</h2>
@@ -37,4 +37,4 @@
     </ul>
   </section>
   <!-- #access-lastmod -->
-{% endif %}
+<!--{% endif %}-->
