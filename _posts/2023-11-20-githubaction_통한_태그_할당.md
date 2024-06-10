@@ -3,7 +3,7 @@ title: Github actions를 통한 PR Assignee & Reviewers 자동 할당
 author: jemlog
 date: 2023-11-20 00:20:00
 categories: [Github Actions]
-tags: [Github Actions, Automatic]
+tags: [github actions]
 pin: false
 img_path: '/assets/img'
 ---
