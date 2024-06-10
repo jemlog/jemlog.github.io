@@ -14,7 +14,7 @@ timezone: Asia/Seoul
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: 깊게 자라기 # the main title
+title: JMDevLog # the main title
 
 tagline: Backend Engineer # it will display as the sub-title
 
@@ -50,7 +50,7 @@ google_site_verification: # fill in to your verification string
 # The end of `jekyll-seo-tag` settings
 
 google_analytics:
-  id: # fill in your Google Analytics ID
+  id: G-86TMMT7V1R
 
 # Prefer color scheme setting.
 #
@@ -63,7 +63,7 @@ google_analytics:
 #     light  - Use the light color scheme
 #     dark   - Use the dark color scheme
 #
-theme_mode: light
+theme_mode: # [dark | light]
 
 # [light|dark]
 
@@ -194,3 +194,6 @@ jekyll-archives:
   permalinks:
     tag: /tags/:name/
     category: /categories/:name/
+
+plugins:
+  - jekyll-target-blank
