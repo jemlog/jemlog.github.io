@@ -16,7 +16,7 @@ timezone: Asia/Seoul
 
 title: JMDevLog # the main title
 
-tagline: Backend Engineer # it will display as the sub-title
+tagline: 딥다이브를 추구하는 개발자 # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   A minimal, responsive and feature-rich Jekyll theme for technical writing.
