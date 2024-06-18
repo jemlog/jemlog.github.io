@@ -1,5 +1,5 @@
 ---
-title: Istio의 mTLS를 사용한 제로 트러스트 구축 (작성중)
+title: Istio의 mTLS를 사용한 제로 트러스트 구축
 author: jemlog
 date: 2024-06-16 00:20:00
 categories: [Istio]
@@ -10,13 +10,15 @@ img_path: '/assets/img'
 
 최근 서비스 운영 환경은 쿠버네티스 클러스터 내에 마이크로서비스를 배포하는 방식이 메인스트림이 되었다고 생각합니다. 그만큼 사용자의 요청이 인그레스를 통해 들어오면 클러스터 내에서 여러 서비스 간 네트워크 통신을 거쳐 응답이 반환되는 구조입니다. 보통 클러스터로 진입하기 이전까지는 HTTPS 암호화 통신이 보장되지만 클러스터 내부로 들어오면 평문 데이터 통신을 하게 됩니다. 
 
-만약 악의적인 사용자가 인그레스 게이트웨이를 거치지 않고 클러스터 내부로 접근해서 트래픽을 캡쳐한다면 중요한 데이터가 외부로 노출될 위험이 있습니다. 따라서 쿠버네티스 클러스터 내에서도 데이터를 암호화하고 인증받은 클라이언트만 API를 호출할 수 있도록 해야합니다. 쿠버네티스 클러스터 내의 트래픽 통제를 위해 서비스 메시라는 아키텍쳐를 도입할 수 있습니다. 이때 Istio를 많이 사용하고, Istio의 mTLS 기능을 통해 보안성을 높힐 수 있습니다. Istio에는 클라이언트와 서버간의 인가 정책을 설정하는 기능들도 존재하지만 이번 포스팅에서는 mTLS에만 집중하도록 하겠습니다. 
+만약 악의적인 사용자가 인그레스 게이트웨이를 거치지 않고 클러스터 내부로 접근해서 트래픽을 캡쳐한다면 중요한 데이터가 외부로 노출될 위험이 있습니다. 따라서 쿠버네티스 클러스터 내에서도 데이터를 암호화하고 인증받은 클라이언트만 API를 호출할 수 있도록 해야합니다. 
+
+쿠버네티스 클러스터 내의 트래픽 통제를 위해 서비스 메시라는 아키텍쳐를 도입할 수 있습니다. 이때 Istio를 많이 사용하고, Istio의 mTLS 기능을 통해 보안성을 높힐 수 있습니다. Istio에는 클라이언트와 서버간의 인가 정책을 설정하는 기능들도 존재하지만 이번 포스팅에서는 mTLS에만 집중하도록 하겠습니다. 
 
 ## mTLS
 
 mTLS는 기존의 TLS 방식과 다르게 네트워크 연결의 양쪽 끝에 있는 양 당사자가 올바른 개인 키를 가지고 있는지 확인하여 그들이 주장하는 당사자인지 확인하는 방법이다. 기존의 TLS는 서버 인증서를 통해 서버의 신뢰성만 확인하면 되는 방식이었지만, mTLS의 경우 클라이언트 인증서를 가지고 클라이언트의 신뢰성까지 보장해야 하는 방식이다.
 
-그렇다면 TLS가 사용되는 모든 영역에서 mTLS를 사용하면 안전성을 강화할 수 있는게 아닐까? 하지만 일반 웹 브라우저 환경에서 mTLS를 사용하는건 부적합하다고 할 수 있다. 서비스를 사용하는 사용자는 수천만명이 될 수 있는데, mTLS를 적용하기 위해서는 수천만명이 자신을 인증하기 위한 개별적인 인증서를 가지고 있어야 하기 때문이다.
+그렇다면 TLS가 사용되는 모든 영역에서 mTLS를 사용하면 안전성을 강화할 수 있는게 아닐까? 하지만 일반 웹 브라우저 환경에서 mTLS를 사용하는건 부적합하다고 할 수 있다. 서비스를 사용하는 사용자는 수만명이 될 수 있는데, mTLS를 적용하기 위해서는 모든 사용자가 자신을 인증하기 위한 개별적인 인증서를 가지고 있어야 하기 때문이다. 따라서 mTLS는 server to server 환경에서 신뢰성을 보장하는데 사용하기 적합하다고 생각한다. 
 
 ## mTLS의 동작 방식
 
@@ -70,7 +72,7 @@ metadata:
   name: default
 spec:
   mtls:
-    mode: STRICT # mode 설정 가능
+    mode: PERMISSIVE # mode 설정 가능
 ```
 
 Istio의 mTLS 모드에는 3가지가 존재한다.
@@ -83,11 +85,39 @@ Istio의 mTLS 모드에는 3가지가 존재한다.
 PERMISSIVE 모드는 쿠버네티스 클러스터에 점진적으로 mTLS를 적용하는 단계에 적절하다고 생각한다. 하지만 완전한 제로 트러스트를 구축하기 위해서는 모든 클라이언트와 서버가 mTLS를 사용하도록
 STRICT 모드를 사용해야 한다.
 
-mTLS가 정상적으로 적용됐는지는 Kiali라는 Istio 모니터링 도구를 사용하면 편리하게 확인할 수 있다.
+mTLS가 정상적으로 적용됐는지는 Kiali라는 Istio 모니터링 도구를 사용하면 편리하게 확인할 수 있다. 현재 foo와 bar이라는 네임스페이스를 만든 후, foo에는 Istio의 Envoy 프록시를 주입하고, bar에는 Envoy 프록시를 주입하지 않았다. 트래픽을 전송하면 Kiali 대시보드 상에 어떻게 나오는지 보자.
 
-## Istio mTLS 적용 확인
+<img width="800" alt="스크린샷 2024-06-17 오후 8 44 37" src="https://github.com/jemlog/argo-cd-test-repo/assets/82302520/1f632789-c05d-464f-a3e6-359205cab982">
 
-쿠버네티스 클러스터 내에서 mTLS가 잘 적용 됐다는건 Kiali의 자물쇠 표시를 통해서 잘 확인했다. 그래도 정말로 데이터가 잘 암호화됐는지 확인해보고 싶다. 직접 tcpdump를 통해서 데이터 암호화 여부를 확인해보자.
+위의 사진을 보면 foo 네임스페이스 내부적인 연결에는 자물쇠가 걸려있고, foo에서 bar로 가는 트래픽에는 자물쇠가 없는걸 알 수 있다. 자물쇠 존재 여부로 mTLS가 적용됐는지를 파악할 수 있다. 
+현재 Istio의 mTLS 정책은 `PERMISSIVE`이기에 평문 데이터를 요청으로 받는게 허용된다. 한번 직접 호출해보겠다. 
+
+```shell
+$ kubectl exec "$(kubectl get pod -l app=sleep -n bar -o jsonpath={.items..metadata.name})" -c sleep -n bar -- curl http://httpbin.foo:8000/ip -s -o /dev/null -w "bar에서 foo로 plainText 전송 : %{http_code}\n"
+
+bar에서 foo로 plainText 전송 : 200
+```
+
+위의 결과에서 숫자는 HTTP 상태코드를 나타낸다. 요청을 보내면 정상적으로 200이 반환되는걸 알 수 있다. 하지만 세밀한 제로 트러스트를 구축하기 위해서는 `STRICT` 모드로 변경해야 한다.
+
+```yaml
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+spec:
+  mtls:
+    mode: STRICT
+```
+모드를 변경한 다음 똑같이 요청을 보내보자.
+
+```shell
+$ kubectl exec "$(kubectl get pod -l app=sleep -n bar -o jsonpath={.items..metadata.name})" -c sleep -n bar -- curl http://httpbin.foo:8000/ip -s -o /dev/null -w "bar에서 foo로 plainText 전송 : %{http_code}\n"
+
+bar에서 foo로 plainText 전송 : 000
+command terminated with exit code 56
+```
+이번에는 다른 결과가 나온걸 알 수 있다. foo 측에서는 상대방도 mTLS를 사용하는 경우에만 트래픽을 허용하도록 설정했기 때문에 평문 데이터를 트래픽이 차단된 것이다. Istio는 이런 방식으로 안전한 데이터 암호화를 지원한다.
 
 ## 결론
 
@@ -95,7 +125,8 @@ mTLS가 정상적으로 적용됐는지는 Kiali라는 Istio 모니터링 도구
 
 ## Reference
 
-- [https://www.samsungsds.com/kr/insights/zero_trust.html](https://www.samsungsds.com/kr/insights/zero_trust.html)
+- [https://istio.io/latest/docs/concepts/security/](https://istio.io/latest/docs/concepts/security/)
+- [https://www.youtube.com/watch?v=4sJd6PIkP_s](https://www.youtube.com/watch?v=4sJd6PIkP_s)
 
 
 [nodejs]: https://nodejs.org/
