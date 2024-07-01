@@ -52,6 +52,7 @@ mTLS는 기존의 TLS 동작 플로우에 비해 몇단계가 추가된다.
 위에서 살펴봤듯이 mTLS를 위해서는 클라이언트와 서버가 모두 mTLS 인증서를 가지고 있어야 한다. 만약 클라이언트와 서버가 각각 하나씩이라면 직접 양쪽에 인증서를 설치하면 된다. 하지만 MSA 환경에서는 수백 수천개의 파드가 동작할 수 있다. 모드 파드에 인증서를 설치하는건 너무나 비효율적인 과정이기에 개발자 대신 인증서를 설치하는 과정이 필요할 것이다. Istio는 아래의 과정을 거쳐서
 mTLS 인증서를 Envoy Proxy에 설치한다.
 
+
 <img width="401" alt="스크린샷 2024-06-17 오후 8 44 37" src="https://github.com/jemlog/tech-study/assets/82302520/7daa76ee-e08a-4e34-96e4-5234a945f2ea">
 
 1. istiod는 CSR(certificate signing requests)를 받기 위한 gRPC 서비스를 제공한다.
@@ -87,7 +88,7 @@ STRICT 모드를 사용해야 한다.
 
 mTLS가 정상적으로 적용됐는지는 Kiali라는 Istio 모니터링 도구를 사용하면 편리하게 확인할 수 있다. 현재 foo와 bar이라는 네임스페이스를 만든 후, foo에는 Istio의 Envoy 프록시를 주입하고, bar에는 Envoy 프록시를 주입하지 않았다. 트래픽을 전송하면 Kiali 대시보드 상에 어떻게 나오는지 보자.
 
-<img width="800" alt="스크린샷 2024-06-17 오후 8 44 37" src="https://github.com/jemlog/argo-cd-test-repo/assets/82302520/1f632789-c05d-464f-a3e6-359205cab982">
+![340785824-1f632789-c05d-464f-a3e6-359205cab982](https://github.com/CMC11th-Melly/Melly_Server/assets/82302520/9789e15c-6b32-40f4-a11a-503189da71ef)
 
 위의 사진을 보면 foo 네임스페이스 내부적인 연결에는 자물쇠가 걸려있고, foo에서 bar로 가는 트래픽에는 자물쇠가 없는걸 알 수 있다. 자물쇠 존재 여부로 mTLS가 적용됐는지를 파악할 수 있다. 
 현재 Istio의 mTLS 정책은 `PERMISSIVE`이기에 평문 데이터를 요청으로 받는게 허용된다. 한번 직접 호출해보겠다. 
