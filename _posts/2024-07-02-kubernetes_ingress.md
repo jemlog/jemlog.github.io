@@ -18,7 +18,7 @@ img_path: '/assets/img'
 
 우선 인그레스의 가장 기본이 되는 **Ingress**라는 오브젝트에 대해 알아보자. Ingress는 특정 Rule에 따라 외부 트래픽이 어떤 내부 Service와 매칭될지를 명시한 스펙이다.
 
-<img width="476" alt="스크린샷 2024-07-04 오전 3 32 56" src="https://github.com/jemlog/tech-study/assets/82302520/875627d4-3c42-4806-b6da-b3b8e9e4a76b">
+<img width="300" alt="스크린샷 2024-07-04 오전 3 32 56" src="https://github.com/jemlog/tech-study/assets/82302520/875627d4-3c42-4806-b6da-b3b8e9e4a76b">
 
 위 그림은 Ingress의 구조를 개략적으로 나타낸 것이다. `host` 필드에는 들어오는 요청의 도메인을 설정할 수 있고, `name` 필드에는 요청이 어떤 내부 Service와 매칭되는지를 명시한다. 아래는 자세한 Ingress Spec이다.
 
