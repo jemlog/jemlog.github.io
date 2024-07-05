@@ -1,5 +1,5 @@
 ---
-title: 로드밸런서와 Ingress를 사용한 쿠버네티스 클러스터 외부 통신 (작성 중)
+title: 로드밸런서와 Ingress를 사용한 쿠버네티스 클러스터 외부 통신
 author: jemlog
 date: 2024-07-02 00:20:00
 categories: [Kubernetes]
@@ -8,21 +8,19 @@ pin: false
 img_path: '/assets/img'
 ---
 
-이전 포스팅에서는 쿠버네티스 클러스터 내부 통신을 담당하는 Service 오브젝트의 동작원리에 대해 깊게 살펴봤습니다. 클라이언트가 서비스를 이용하기 위해서는 결국 클러스터 외부에서 접속을 시도해야 합니다.
-이때 어떤 과정을 거쳐서 요청이 클러스터 내부로 들어오는지 살펴보고자 합니다. 
+[이전 포스팅](https://jemlog.github.io/posts/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4_%EC%84%9C%EB%B9%84%EC%8A%A4_%EB%8F%99%EC%9E%91_%EB%B6%84%EC%84%9D/)에서는 쿠버네티스 클러스터 내부 통신을 담당하는 Service 오브젝트의 동작원리에 대해 깊게 살펴봤습니다. 
+클라이언트가 서비스를 이용하기 위해서는 결국 클러스터 외부에서 접속을 시도해야 합니다. 이때 클러스터의 가장 앞단에서 외부 트래픽을 보안/수정 처리를 한 후 내부 Service로 라우팅하는 역할을 하는 컴포넌트가 존재하는데, 이를 **인그레스 컨트롤러**라고 합니다.
+
+이번 포스팅에서는 인그레스와 관련된 요소들이 어떤게 있는지 살펴보고, 외부 트래픽이 어떤 흐름으로 클러스터의 내부 파드까지 전달이 되는지 분석해보겠습니다. 인그레스는 클러스터에 유입되는 모든 트래픽을 관리하는 만큼 인그레스 컨트롤러(Nginx) 자체가 제공하는 기능에 대한 깊은 이해가 필요합니다. 이 부분은 실무를 진행하면서
+경험치를 쌓아나가야 한다고 생각하기에, 이번에는 쿠버네티스 오브젝트와 관련된 부분만 학습을 진행해보겠습니다.
 
 ## Ingress
 
-쿠버네티스는 **Ingress**라는 오브젝트를 통해 클러스터 내부 서비스에 대한 라우팅을 수행한다. 
+우선 인그레스의 가장 기본이 되는 **Ingress**라는 오브젝트에 대해 알아보자. Ingress는 특정 Rule에 따라 외부 트래픽이 어떤 내부 Service와 매칭될지를 명시한 스펙이다.
 
 <img width="476" alt="스크린샷 2024-07-04 오전 3 32 56" src="https://github.com/jemlog/tech-study/assets/82302520/875627d4-3c42-4806-b6da-b3b8e9e4a76b">
 
-위 그림은 Ingress의 구조를 개략적으로 나타낸 것이다. 
-Ingress Spec에는 요청이 들어오는 호스트를 지정할 수 있는 **host** 필드와 어떤 Service에 매핑되는지를 결정하는 **service.name** 필드가 있다. 
-즉, **test.first.com**이라는 호스트 네임으로 요청이 들어오면 내부의 **first_svc**이라는 Service와 연결되는 것이다.
-자세한 트래픽 흐름이 어떻게 되는지는 인그레스 컨트롤러 부분에서 자세히 살펴보도록 하자.
-
-아래는 Ingress Spec이다.
+위 그림은 Ingress의 구조를 개략적으로 나타낸 것이다. `host` 필드에는 들어오는 요청의 도메인을 설정할 수 있고, `name` 필드에는 요청이 어떤 내부 Service와 매칭되는지를 명시한다. 아래는 자세한 Ingress Spec이다.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -63,37 +61,21 @@ spec:
 중요한 내용들 위주로 살펴보자. IngressClassName 필드를 사용해서 IngressClass와 연결할 수 있다. 이때 IngressClass는 Ingress Controller와 Ingress를 연결하는 매개체 역할을 한다.
 IngressClass에 대한 자세한 내용은 뒤에서 알아보겠다.
 
-Ingress는 Virtual Name 기반으로 여러개의 도메인에 대한 분기도 가능하다. 
-위의 Spec에서는 test.first.com과 test.second.com으로 도메인을 분기했다. 
-만약 path 조건까지 매칭되면 설정한 Service 이름과 포트가 반환된다. 
+Ingress는 Virtual Name 기반으로 여러개의 도메인에 대한 분기도 가능하다.
+위의 Spec에서는 test.first.com과 test.second.com으로 도메인을 분기했다.
+만약 path 조건까지 매칭되면 설정한 Service 이름과 포트가 반환된다.
 
 마지막으로 tls 필드를 통해서 Ingress에서 TLS Termination을 수행하도록 만들 수 있다. 이때 TLS 인증서는 Secret 오브젝트에 미리 등록해놔야 한다.
 
-Ingress에 대한 더 자세한 내용은 [공식문서](https://kubernetes.io/docs/concepts/services-networking/ingress/)를 참고해보자. 
+Ingress에 대한 더 자세한 내용은 [공식문서](https://kubernetes.io/docs/concepts/services-networking/ingress/)를 참고해보자.
 
-## Ingress Controller
 
-지금까지 Ingress에 대해 알아봤다. 근데 Ingress만 있으면 외부와 통신을 수행할 수 있을까? 
+## IngressClass
+
+지금까지 Ingress에 대해 알아봤다. 근데 Ingress만 있으면 외부와 통신을 수행할 수 있을까?
 
 Ingress는 사실 Rule을 표현한 것에 불과하기 때문에 실제 트래픽을 받고 라우팅을 하는 추가적인 컴포넌트가 필요하다. 이 역할을 하는게 **Ingress Controller**다.
-Ingress Controller는 직접 설치를 해야하고, 대표적으로 Nginx를 Ingress Controller로 사용할 수 있다. 
-
-Ingress Controller를 처음 접하면, 트래픽이 Ingress Controller -> Ingress -> Service -> Pod 순서로 들어간다고 생각할 수 있다. 하지만 Ingress Controller는 직접 Pod로 트래픽을 전송한다. 이게 어떻게 가능한걸까? 아래 그림을 순서대로 살펴보자.
-
-<img width="876" alt="스크린샷 2024-07-04 오전 5 04 05" src="https://github.com/jemlog/tech-study/assets/82302520/d9f926b1-e8a7-42f9-b9f3-fc48baec4441">
-
-1. Ingress Controller는 kube-apiserver로부터 모든 네임스페이스에 존재하는 Ingress 정보를 모두 조회한다.
-2. 획득한 Ingress에서 Service 이름을 추출한다.
-3. Service 이름과 매핑된 EndpointSlice들을 조회한다.
-4. EndpointSlice에 할당된 Pod IP들을 가져와서 직접 Pod로 트래픽을 전송한다.
-
-결론적으로 트래픽은 Ingress Controller로 들어온 뒤 바로 Pod로 향한다. 따라서 원래 Pod 로드밸런싱을 담당하던 Service의 역할은 사라진다. 대신 Ingress Controller가 자체적으로 로드밸런싱을 수행한다.
-
-### ClusterRole & ClusterRoleBinding
-
-### IngressClass
-
-그렇다면 Ingress와 Ingress Controller를 어떻게 연결할 수 있을까? 이 역할을 수행하는게 `IngressClass`이다.
+Ingress와 Ingress Controller를 연결해주는 중간 매개체가 필요한데, 이 역할을 수행하는게 `IngressClass`이다.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -109,11 +91,23 @@ spec:
 Ingress 오브젝트는 ingressClassName 필드를 설정해서 ingressClass에 연결할 수 있다. 만약 ingressClassName을 지정하지 않은 경우에는 default로 생성한 ingressClass에 자동으로 연결된다.
 단, default ingressClass는 전체에서 딱 하나만 설정 가능하다.
 
-그렇다면 Ingress Controller로 사용할 수 있는 기술들은 어떤게 있을까? 이번 포스팅에서는 Nginx와 Istio에서 제공하는 Ingress Controller를 알아보고자 한다.
+## Ingress Controller
 
-### Nginx Ingress Controller
+이제 직접 외부 트래픽을 받는 주체인 인그레스 컨트롤러에 대해 알아보도록 하자. 인그레스 컨트롤러는 직접 설치를 해야하고, 대표적으로 Nginx를 인그레스 컨트롤러로 사용할 수 있다. 
 
-Nginx Ingress Controller는 아래와 같이 helm chart로 편리하게 설치할 수 있다. 자세한 내용은 [Nginx Ingress Controller Helm 저장소](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)를 참고하자.
+인그레스 컨트롤러를 처음 접하면, 트래픽이 Ingress Controller -> Ingress -> Service -> Pod 순서로 들어간다고 생각할 수 있다. 하지만 인그레스 컨트롤러는 직접 Pod로 트래픽을 전송한다. 이게 어떻게 가능한걸까? 아래 그림을 순서대로 살펴보자.
+
+<img width="876" alt="스크린샷 2024-07-04 오전 5 04 05" src="https://github.com/jemlog/tech-study/assets/82302520/d9f926b1-e8a7-42f9-b9f3-fc48baec4441">
+
+1. 인그레스 컨트롤러는 kube-apiserver로부터 모든 네임스페이스에 존재하는 Ingress 정보를 모두 조회한다.
+2. 획득한 Ingress에서 Service 이름을 추출한다.
+3. Service 이름과 매핑된 EndpointSlice들을 조회한다.
+4. EndpointSlice에 할당된 Pod IP들을 가져와서 직접 Pod로 트래픽을 전송한다.
+
+결론적으로 트래픽은 인그레스 컨트롤러로 들어온 뒤 바로 Pod로 향한다. 따라서 원래 Pod 로드밸런싱을 담당하던 Service의 역할은 사라진다. 대신 인그레스 컨트롤러가 자체적으로 로드밸런싱을 수행한다.
+
+Nginx 인그레스 컨트롤러는 아래와 같이 helm chart로 편리하게 설치할 수 있다. 
+자세한 내용은 [Nginx Ingress Controller Helm 저장소](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)를 참고하자.
 
 ```shell
 $ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -122,11 +116,12 @@ $ helm repo update
 $ helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
 ```
 
-해당 helm chart를 통해서 어떤 오브젝트들이 설치되는지 살펴보자.
+위의 과정을 거치면 `ingress-nginx` 네임스페이스에 Nginx 인그레스 컨트롤러 파드가 하나 생성된다. 이제 위에서 살펴본 **IngressClass**와 **Ingress**를 연동하면 정상적으로 외부 트래픽을 내부 파드로 전송할 수 있다.
 
-### Istio Ingress Gateway
+## Istio Ingress Gateway
 
-만약 쿠버네티스 클러스터에 Istio 서비스 메시를 도입한 상태라면 Nginx Ingress Controller 대신 Istio에서 기본으로 제공해주는 Istio Ingress Gateway를 사용할 수 있다.
+지금까지는 쿠버네티스 자체적으로 제공하는 Ingress 기능을 사용하는 인그레스 컨트롤러를 살펴봤다.
+만약 쿠버네티스 클러스터에 Istio 서비스 메시를 도입한 상태라면 Nginx 인그레스 컨트롤러 대신 Istio에서 기본으로 제공해주는 Istio 인그레스 게이트웨이를 사용할 수 있다.
 
 <img width="773" alt="스크린샷 2024-07-04 오후 12 58 01" src="https://github.com/jemlog/tech-study/assets/82302520/11641e45-3af9-4442-aa20-d19280d7c0f1">
 
