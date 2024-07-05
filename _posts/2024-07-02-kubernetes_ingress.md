@@ -88,7 +88,7 @@ spec:
   controller: k8s.io/ingress-nginx # ingress-nginx라는 ingress controller를 연결한다
 ```
 
-Ingress 오브젝트는 ingressClassName 필드를 설정해서 ingressClass에 연결할 수 있다. 만약 ingressClassName을 지정하지 않은 경우에는 default로 생성한 ingressClass에 자동으로 연결된다.
+annotations를 보면 **is-default-class : true**가 설정되어 있다. Ingress는 ingressClassName 필드를 통해 특정 ingressClass에 연결할 수 있는데, 만약 지정하지 않은 경우에는 자동으로 default ingressClass에 매핑된다.
 단, default ingressClass는 전체에서 딱 하나만 설정 가능하다.
 
 ## Ingress Controller
