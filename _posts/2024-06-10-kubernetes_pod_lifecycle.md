@@ -1,7 +1,7 @@
 ---
 title: 쿠버네티스 파드 라이프사이클과 리소스 할당 분석
 author: jemlog
-date: 2024-07-14 00:20:00
+date: 2024-06-10 00:20:00
 categories: [Kubernetes]
 tags: [kubernetes]
 pin: false

@@ -1,7 +1,7 @@
 ---
 title: 로드밸런서와 Ingress를 사용한 쿠버네티스 클러스터 외부 통신
 author: jemlog
-date: 2024-07-02 00:20:00
+date: 2024-07-05 00:20:00
 categories: [Kubernetes]
 tags: [kubernetes]
 pin: false
