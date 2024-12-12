@@ -5,7 +5,8 @@ date: 2024-05-09 00:20:00
 categories: [Spring]
 tags: [logback]
 pin: false
-img_path: '/assets/img'
+image:
+  path: '/assets/img/logback.png'
 ---
 
 Logback에 대해 자세히 알아보는 과정에서 AsyncAppender를 통해서 로깅 작업을 비동기적으로 수행할 수 있다는걸 알게 됐습니다.

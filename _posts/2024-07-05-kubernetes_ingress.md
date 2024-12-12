@@ -5,7 +5,8 @@ date: 2024-07-05 00:20:00
 categories: [Kubernetes]
 tags: [kubernetes]
 pin: false
-img_path: '/assets/img'
+image:
+  path: '/assets/img/k8s-image.png'
 ---
 
 [이전 포스팅](https://jemlog.github.io/posts/%EC%BF%A0%EB%B2%84%EB%84%A4%ED%8B%B0%EC%8A%A4_%EC%84%9C%EB%B9%84%EC%8A%A4_%EB%8F%99%EC%9E%91_%EB%B6%84%EC%84%9D/)에서는 쿠버네티스 클러스터 내부 통신을 담당하는 Service 오브젝트의 동작원리에 대해 깊게 살펴봤습니다. 

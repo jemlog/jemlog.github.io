@@ -5,7 +5,8 @@ date: 2024-06-10 00:20:00
 categories: [Kubernetes]
 tags: [kubernetes]
 pin: false
-img_path: '/assets/img'
+image:
+  path: '/assets/img/k8s-image.png'
 ---
 
 쿠버네티스를 잘 사용하기 위해서는 방대한 지식을 습득해야 합니다. 그 중 어플리케이션 개발자가 잘 알아야 하는 분야가 있을 것이고, 반대로 인프라 담당자가 잘 이해해야 하는 분야가 있을 것입니다. 저는 개발자로서 쿠버네티스 워크로드의 최소 단위이자, 우리가 만든 어플리케이션이 동작하는 환경인
