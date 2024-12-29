@@ -14,9 +14,9 @@ timezone: Asia/Seoul
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: 깊게 자라기 # the main title
+title: JM Devlog # the main title
 
-# tagline: 딥다이브를 추구하는 개발자 # it will display as the sub-title
+tagline: 딥다이브를 추구하는 개발자 # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   딥다이브를 추구하는 개발자
