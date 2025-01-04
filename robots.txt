@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://jemlog.github.io/sitemap.xml
