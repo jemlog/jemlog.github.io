@@ -1,6 +1,5 @@
 ---
 title: 분산 캐시 서버 Fault Tolerance 개선기
-author: jemlog
 date: 2023-12-05 00:20:00
 categories: [Project]
 tags: [spring]

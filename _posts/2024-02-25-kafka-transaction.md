@@ -1,6 +1,5 @@
 ---
 title: 카프카 트랜잭션 이해하기
-author: jemlog
 date: 2024-02-25 00:20:00
 categories: [Kafka]
 tags: [kafka]

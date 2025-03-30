@@ -1,6 +1,5 @@
 ---
 title: 카프카 세그먼트 관리
-author: jemlog
 date: 2024-03-24 00:20:00
 categories: [Kafka]
 tags: [kafka]

@@ -1,6 +1,5 @@
 ---
 title: 쿠버네티스 클러스터 내부의 Service 동작 분석
-author: jemlog
 date: 2024-06-15 00:20:00
 categories: [Kubernetes]
 tags: [kubernetes, network]

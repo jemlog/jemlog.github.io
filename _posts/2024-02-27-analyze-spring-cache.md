@@ -1,6 +1,5 @@
 ---
 title: 스프링 캐시 동작 과정 분석
-author: jemlog
 date: 2024-01-05 00:20:00
 categories: [Spring]
 tags: [spring]

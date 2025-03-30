@@ -1,6 +1,5 @@
 ---
 title: 멀티 모듈 분리와 객체 지향 설계에 대한 고민
-author: jemlog
 date: 2023-12-06 20:55:00 +0800
 categories: [Project]
 tags: [spring]

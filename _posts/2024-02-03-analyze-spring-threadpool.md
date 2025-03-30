@@ -1,6 +1,5 @@
 ---
 title: ThreadPoolExecutor 파헤쳐보기
-author: jemlog
 date: 2024-02-03 00:20:00
 categories: [Java]
 tags: [thread]

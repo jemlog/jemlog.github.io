@@ -1,6 +1,5 @@
 ---
 title: Logback AsyncAppender 동작원리 분석
-author: jemlog
 date: 2024-05-09 00:20:00
 categories: [Spring]
 tags: [logback]

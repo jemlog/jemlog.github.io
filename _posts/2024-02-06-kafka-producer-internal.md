@@ -1,6 +1,5 @@
 ---
 title: 카프카 프로듀서 내부 동작 흐름 분석
-author: jemlog
 date: 2024-02-17 00:20:00
 categories: [Kafka]
 tags: [kafka]

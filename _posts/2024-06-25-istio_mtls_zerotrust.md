@@ -1,6 +1,5 @@
 ---
 title: Istio의 mTLS를 사용한 제로 트러스트 구축
-author: jemlog
 date: 2024-06-25 00:20:00
 categories: [Istio]
 tags: [istio, network]

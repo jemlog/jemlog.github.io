@@ -1,6 +1,5 @@
 ---
 title: Redis pub/sub 내부 구현 방식과 특징 분석
-author: jemlog
 date: 2024-01-10 00:20:00
 categories: [Redis]
 tags: [pubsub]

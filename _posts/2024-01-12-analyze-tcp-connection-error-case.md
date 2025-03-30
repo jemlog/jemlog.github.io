@@ -1,6 +1,5 @@
 ---
 title: TCP 통신 시 발생 가능한 예외 케이스 분석
-author: jemlog
 date: 2024-01-10 00:20:00
 categories: [Network]
 tags: [tcp/ip]

@@ -1,6 +1,5 @@
 ---
 title: AuthenticationPrincipal에 null값 들어오는 문제 해결
-author: jemlog
 date: 2022-7-4 00:20:00
 categories: [Project]
 tags: [spring]

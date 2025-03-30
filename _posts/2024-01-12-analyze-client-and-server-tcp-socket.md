@@ -1,6 +1,5 @@
 ---
 title: 클라이언트 소켓과 서버 소켓 운영 주의 사항 및 개선점 분석
-author: jemlog
 date: 2024-01-10 00:20:00
 categories: [Network]
 tags: [tcp/ip]

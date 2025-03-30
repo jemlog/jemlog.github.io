@@ -1,6 +1,5 @@
 ---
 title: 카프카 멀티 브로커 ISR 분석
-author: jemlog
 date: 2024-03-25 00:20:00
 categories: [Kafka]
 tags: [kafka]

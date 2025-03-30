@@ -1,6 +1,6 @@
 ---
 title: 카프카 멱등성 프로듀서를 통한 신뢰성 있는 데이터 전송
-author: jemlog
+: jemlog
 date: 2024-02-25 00:20:00
 categories: [Java]
 tags: [kafka]

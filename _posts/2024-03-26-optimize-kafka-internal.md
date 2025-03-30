@@ -1,6 +1,5 @@
 ---
 title: 카프카 내부 최적화
-author: jemlog
 date: 2024-03-24 00:20:00
 categories: [Kafka]
 tags: [kafka]
