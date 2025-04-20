@@ -171,7 +171,7 @@ spec:
   storageClassName: ebs-sc
 ```
 
-우선 PVC 까지는 생성했다. 그 전에 우리는 storageClass의 volumeBindingMode를 WaitForFirstConsumer로 설정했다. 그렇다면 아직 PV와 EBS 볼륨은 마운트 되지 않은 상태여야 한다. 이 부분을 확인해보자.
+우선 PVC 까지는 생성했다. 그 전에 우리는 storageClass의 volumeBindingMode를 **WaitForFirstConsumer**로 설정했다. 그렇다면 아직 PV와 EBS 볼륨은 마운트 되지 않은 상태여야 한다. 이 부분을 확인해보자.
 
 ```bash
 NAME                              STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
@@ -277,7 +277,7 @@ I0420 12:02:08.272688       1 event.go:389] "Event occurred" object="default/ebs
 I0420 12:02:09.102968       1 csi_handler.go:261] "Attaching" VolumeAttachment="csi-dfb1074e3a4b284b0fd8fcf85e85b811734b4bc7c53ae84b0145fd8502505ebb"
 I0420 12:02:11.132275       1 csi_handler.go:273] "Attached" VolumeAttachment="csi-dfb1074e3a4b284b0fd8fcf85e85b811734b4bc7c53ae84b0145fd8502505ebb"
 ```
-VolumeAttachment attached 됐다는 로그를 볼 수 있다. 여기서 VolumeAttachment는 뭘 말하는 걸까.
+VolumeAttachment attached 됐다는 로그를 볼 수 있다. 여기서 **VolumeAttachment**는 뭘 말하는 걸까.
 
 ```bash
 $ kubectl get VolumeAttachment
@@ -285,7 +285,23 @@ $ kubectl get VolumeAttachment
 NAME                                                                   ATTACHER          PV                                         NODE                                               ATTACHED   AGE
 csi-dfb1074e3a4b284b0fd8fcf85e85b811734b4bc7c53ae84b0145fd8502505ebb   ebs.csi.aws.com   pvc-08b38a96-ce99-49db-9a3b-8c460eedgrd4   ip-192-168-1-144.ap-northeast-2.compute.internal   true       13m
 ```
-kubectl로 VolumeAttachment를 조회해보면 우리가 위에서 생성한 PV와 연계되어 있다는걸 알 수 있다. 즉 어떤 Node에 어떤 PV가 연동됐는지에 대한 정보를 가지고 있는 리소스인 것이다. 이와 같이 CSI Driver는 EKS와 EBS 중간에서 볼륨을 동적으로 할당 받을 수 있도록 만들어준다. 볼륨의 생성 뿐만 아니라 변경/삭제 모두 CSI Driver가 유연하게 처리해준다.
+kubectl로 VolumeAttachment를 조회해보면 우리가 위에서 생성한 PV와 연계되어 있다는걸 알 수 있다. 즉 어떤 Node에 어떤 PV가 연동됐는지에 대한 정보를 가지고 있는 리소스인 것이다. 이와 같이 CSI Driver는 EKS와 EBS 중간에서 볼륨을 동적으로 할당 받을 수 있도록 만들어준다. 
+
+다음으로는 할당된 볼륨 사이즈를 변경해보자. kubectl의 patch 명령어를 사용해 4Gi 할당되있던 볼륨을 8Gi로 확장한다.
+
+```bash
+kubectl patch pvc ebs-claim \
+  --type merge \
+  -p '{"spec": {"resources": {"requests": {"storage": "8Gi"}}}}'
+```
+이후 다시 PVC와 PV를 조회해보면 Capacity가 8Gi로 확장된걸 알 수 있다. 이 과정은 EBS CSI Controller의 **resizer**가 수행한다.
+```bash
+NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM               STORAGECLASS   REASON   AGE
+persistentvolume/pvc-08b38a96-ce99-49db-9a3b-8c460eedec1d   8Gi        RWO            Delete           Bound    default/ebs-claim   ebs-sc                  123m
+
+NAME                              STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+persistentvolumeclaim/ebs-claim   Bound    pvc-08b38a96-ce99-49db-9a3b-8c460eedec1d   8Gi        RWO            ebs-sc         126m
+```
 
 ## 결론
 
