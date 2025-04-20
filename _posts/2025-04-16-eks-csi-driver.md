@@ -116,7 +116,7 @@ EBS CSI Driver는 크게 두개의 컴포넌트로 구성된다. **ebs-csi-contr
 - **node-register**: node-plugin을 kubelet에 등록해주는 사이드카
 - **liveness-probe**: CSI Driver가 정상 동작하는지 지속적으로 체크한다.
 
-위의 컨테이너들은 서로 상호작용하며 AWS SDK를 사용해 EBS API를 통해 외부 스토리지와 EKS 노드를 연결해준다.
+위의 컨테이너들은 서로 상호작용하며 AWS SDK를 사용해 EBS API를 통해 외부 스토리지와 EKS 노드를 연결해준다. 참고로 AWS EBS CSI Controller는 AWS의 Fargate 노드에서 실행할 수 있지만 EBS CSI Node 데몬셋은 EC2 인스턴스에서만 실행 가능하다.
 
 그렇다면 어떤 과정을 거쳐서 사용하는지 살펴보자. 먼저 EBS CSI Driver를 위한 IRSA를 만들어줘야 한다. 여기서 **IRSA**는 IAM Roles for Service Accounts의 줄임말로 AWS EKS에서 Kubernetes ServiceAccount에 IAM Role을 연결할 수 있도록 해준다.
 
