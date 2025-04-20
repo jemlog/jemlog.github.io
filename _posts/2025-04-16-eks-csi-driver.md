@@ -1,5 +1,5 @@
 ---
-title: AWS CSI Driver를 사용한 EKS 내 스토리지 관리 (작성중)
+title: AWS CSI Driver를 사용한 EKS 내 스토리지 관리
 date: 2025-04-16 00:20:00
 categories: [Kubernetes]
 tags: [kubernetes, EKS]
@@ -130,6 +130,168 @@ eksctl create iamserviceaccount \
   --role-only \ # IAM Role만 생성
   --role-name AmazonEKS_EBS_CSI_DriverRole # Role Name 지정
 ```
+다음으로는 EBS CSI Driver 애드온을 설치한다.
+
+```bash
+eksctl create addon --name aws-ebs-csi-driver\
+ --cluster my-cluster\
+ --service-account-role-arn arn:aws:iam::{accountId}:role/AmazonEKS_EBS_CSI_DriverRole\
+ --force
+```
+
+애드온이 설치하고 나면 위에서 살펴봤던 ebs-csi-controller와 ebs-csi-node가 생성된걸 확인할 수 있다. 이제 EBS CSI Driver를 사용한 동적 프로비저닝을 테스트 해보자.
+
+우선 StorageClass를 만들어준다.
+```yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: ebs-sc
+allowVolumeExpansion: true # 해당 값이 true로 설정되있으면 PVC에서 동적으로 용량을 변경할 수 있다
+provisioner: ebs.csi.aws.com # 해당 값을 사용하면 ebs csi driver를 사용한다
+volumeBindingMode: WaitForFirstConsumer # WaitForFirstConsumer를 사용하면 첫번째 Pod가 볼륨을 사용할때 PV와 스토리지가 생성 및 연결된다. 해당 옵션을 사용하면 파드가 생성되는 AZ에 EBS를 올바르게 할당 가능하다
+parameters:
+  type: gp3
+  allowAutoIOPSPerGBIncrease: 'true' # IOPS를 용량에 따라 동적으로 늘린다
+  encrypted: 'true' # 생성되는 EBS 볼륨을 KMS 키로 자동 암호화한다. 만약 kmsKeyId 필드를 추가하면 사용자 지정 KMS 키 사용 가능
+```
+
+다음으로는 PVC를 만들어준다.
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-claim
+spec:
+  accessModes:
+    - ReadWriteOnce # EBS는 ReadWriteOnce만 사용 가능하다
+  resources:
+    requests:
+      storage: 4Gi
+  storageClassName: ebs-sc
+```
+
+우선 PVC 까지는 생성했다. 그 전에 우리는 storageClass의 volumeBindingMode를 WaitForFirstConsumer로 설정했다. 그렇다면 아직 PV와 EBS 볼륨은 마운트 되지 않은 상태여야 한다. 이 부분을 확인해보자.
+
+```bash
+NAME                              STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+persistentvolumeclaim/ebs-claim   Pending                                      ebs-sc         11s
+
+NAME                                        PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE	   ALLOWVOLUMEEXPANSION   AGE
+storageclass.storage.k8s.io/ebs-sc          ebs.csi.aws.com         Delete          WaitForFirstConsumer   true                   69s
+```
+PV, PVC, SC가 모두 잘 생성됐는지를 확인해보면 PV는 아직 생성되지 않고 PVC는 Pending 상태인걸 알 수 있다. 실제 파드가 연결되야만 PV와 볼륨이 생성될 것이다. 그렇다면 이번에는 PVC를 attach하는 파드를 생성해보자.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ebs-app
+spec:
+  terminationGracePeriodSeconds: 3
+  containers:
+  - name: app
+    image: centos:7
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo $(date -u) >> /data/out.txt; sleep 10; done"] # /data/out.txt에 로그를 주기적으로 기록한다
+    volumeMounts:
+    - name: persistent-storage
+      mountPath: /data # 해당 경로를 마운트
+  volumes:
+  - name: persistent-storage # ebs-claim 이라는 이름의 PVC를 사용해서 볼륨을 마운트 한다 
+    persistentVolumeClaim:
+      claimName: ebs-claim 
+```
+
+파드까지 생성한뒤에는 EBS 볼륨과 PV가 어떻게 됐는지 확인해보자.
+
+```bash
+NAME          READY   STATUS    RESTARTS   AGE
+pod/ebs-app   1/1     Running   0          23s
+
+NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM               STORAGECLASS   REASON   AGE
+persistentvolume/pvc-08b38a96-ce99-49db-9a3b-8c460eedgrd4   4Gi        RWO            Delete           Bound    default/ebs-claim   ebs-sc                  20s
+
+NAME                              STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+persistentvolumeclaim/ebs-claim   Bound    pvc-08b38a96-ce99-49db-9a3b-8c460eedgrd4   4Gi        RWO            ebs-sc         3m36s
+```
+
+PVC는 상태가 Bound 상태로 변경됐다. 또한 PV가 새롭게 생성된 걸 알 수 있다. aws-cli를 사용해 생성된 EBS를 조회해보면 PV와 연결된 EBS도 동적으로 생성됐다.
+
+```json
+{
+      "Iops": 3000,
+      "Tags": [
+        {
+          "Key": "kubernetes.io/created-for/pv/name",
+          "Value": "pvc-08b38a96-ce99-49db-9a3b-8c460eedgrd4"
+        },
+        {
+          "Key": "kubernetes.io/cluster/my-cluster",
+          "Value": "owned"
+        },
+        {
+          "Key": "KubernetesCluster",
+          "Value": "my-cluster"
+        },
+        {
+          "Key": "kubernetes.io/created-for/pvc/name",
+          "Value": "ebs-claim"
+        },
+        {
+          "Key": "CSIVolumeName",
+          "Value": "pvc-08b38a96-ce99-49db-9a3b-8c460eedgrd4"
+        },
+        {
+          "Key": "Name",
+          "Value": "my-cluster-dynamic-pvc-08b38a96-ce99-49db-9a3b-8c460eedgrd4"
+        },
+        {
+          "Key": "ebs.csi.aws.com/cluster",
+          "Value": "true"
+        },
+        {
+          "Key": "kubernetes.io/created-for/pvc/namespace",
+          "Value": "default"
+        }
+      ],
+      "VolumeType": "gp3",
+      "MultiAttachEnabled": false,
+      "Throughput": 125,
+      "Operator": {
+        "Managed": false
+      }
+}
+```
+
+이번에는 EBS CSI Provider가 어떻게 동작했는지 로그를 통해 확인해보자.
+
+```bash
+I0420 12:02:05.994711       1 event.go:389] "Event occurred" object="default/ebs-claim" fieldPath="" kind="PersistentVolumeClaim" apiVersion="v1" type="Normal" reason="Provisioning" message="External provisioner is provisioning volume for claim \"default/ebs-claim\""
+I0420 12:02:08.262940       1 controller.go:958] successfully created PV pvc-08b38a96-ce99-49db-9a3b-8c460eedgrd4 for PVC ebs-claim and csi volume name vol-0b713fe76d49f686b
+I0420 12:02:08.272688       1 event.go:389] "Event occurred" object="default/ebs-claim" fieldPath="" kind="PersistentVolumeClaim" apiVersion="v1" type="Normal" reason="ProvisioningSucceeded" message="Successfully provisioned volume pvc-08b38a96-ce99-49db-9a3b-8c460eedgrd4"
+```
+로그를 보면 첫번째로 PV 생성 이벤트를 받은 후 PV 생성이 진행된걸 알 수 있다. 다음으로 실제 EBS volume 프로비저닝까지 정상 수행 됐다. 다음으로는 Attacher가 어떻게 동작했는지 살펴보자.
+
+```bash
+I0420 12:02:09.102968       1 csi_handler.go:261] "Attaching" VolumeAttachment="csi-dfb1074e3a4b284b0fd8fcf85e85b811734b4bc7c53ae84b0145fd8502505ebb"
+I0420 12:02:11.132275       1 csi_handler.go:273] "Attached" VolumeAttachment="csi-dfb1074e3a4b284b0fd8fcf85e85b811734b4bc7c53ae84b0145fd8502505ebb"
+```
+VolumeAttachment attached 됐다는 로그를 볼 수 있다. 여기서 VolumeAttachment는 뭘 말하는 걸까.
+
+```bash
+$ kubectl get VolumeAttachment
+
+NAME                                                                   ATTACHER          PV                                         NODE                                               ATTACHED   AGE
+csi-dfb1074e3a4b284b0fd8fcf85e85b811734b4bc7c53ae84b0145fd8502505ebb   ebs.csi.aws.com   pvc-08b38a96-ce99-49db-9a3b-8c460eedgrd4   ip-192-168-1-144.ap-northeast-2.compute.internal   true       13m
+```
+kubectl로 VolumeAttachment를 조회해보면 우리가 위에서 생성한 PV와 연계되어 있다는걸 알 수 있다. 즉 어떤 Node에 어떤 PV가 연동됐는지에 대한 정보를 가지고 있는 리소스인 것이다. 이와 같이 CSI Driver는 EKS와 EBS 중간에서 볼륨을 동적으로 할당 받을 수 있도록 만들어준다. 볼륨의 생성 뿐만 아니라 변경/삭제 모두 CSI Driver가 유연하게 처리해준다.
+
+## 결론
+
+AWS EBS를 EKS에 연결하는 방법에 대해 알아봤다. CSI Driver를 사용하면 EBS 뿐만 아니라 다른 스토리지도 유연하게 연동할 수 있다. EBS 기반으로 충분히 실습을 해본 뒤에 필요에 따라 다른 스토리지들도 학습을 해나가고자 한다.
+
+
 
 [nodejs]: https://nodejs.org/
 [starter]: https://github.com/cotes2020/chirpy-starter
